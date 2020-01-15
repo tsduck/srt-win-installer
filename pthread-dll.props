@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Visual Studio or MSBuild property file to use Pthread-Win32 DLL -->
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Select appropriate directory for binary libraries -->
+  <PropertyGroup Label="UserMacros">
+    <PTHREADLIBDIR>$(PTHREAD_WIN32)\lib\$(Configuration)-$(Platform)</PTHREADLIBDIR>
+  </PropertyGroup>
+
+  <!-- Compilation and link options -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PTHREAD_WIN32)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>pthread_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(PTHREADLIBDIR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <!-- Copy Pthread DLL into project directory to allow direct testing -->
+  <Target Name="CopyPthreadToDestination">
+    <Message Text="Copying $(PTHREADLIBDIR)\pthread_dll.dll to $(OutDir)" />
+    <Copy SourceFiles="$(PTHREADLIBDIR)\pthread_dll.dll" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <PropertyGroup>
+    <PrepareForRunDependsOn>$(PrepareForRunDependsOn);CopyPthreadToDestination</PrepareForRunDependsOn>
+  </PropertyGroup>
+
+</Project>
