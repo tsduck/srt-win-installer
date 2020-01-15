@@ -13,7 +13,7 @@
 param([switch]$NoPause = $false)
 
 Write-Output "Pthread-win32 build procedure"
-$RepoUrl = "https://github.com/Haivision/pthread-win32.git"
+$RepoUrl = "https://github.com/GerHobbelt/pthread-win32.git"
 
 # A function to exit this script.
 function Exit-Script([string]$Message = "")
@@ -103,11 +103,11 @@ if (-not $MSBuild) {
     Exit-Script "MSBuild not found"
 }
 
-# Build libraries
-Write-Output "Building pthread libraries ..."
+# Build the static libraries only.
+Write-Output "Building pthread static libraries ..."
 foreach ($Conf in @("Release", "Debug")) {
     foreach ($Platform in @("x64", "Win32")) {
-        & $MSBuild $SlnOut /nologo /maxcpucount /property:Configuration=$Conf /property:Platform=$Platform /target:"pthread_dll;pthread_lib"
+        & $MSBuild $SlnOut /nologo /maxcpucount /property:Configuration=$Conf /property:Platform=$Platform /target:pthread_lib
     }
 }
 
@@ -116,12 +116,10 @@ Write-Output "Checking compiled libraries ..."
 $Missing = 0
 foreach ($Conf in @("Release", "Debug")) {
     foreach ($Platform in @("x64", "Win32")) {
-        foreach ($File in @("pthread_dll.dll", "pthread_dll.lib", "pthread_lib.lib")) {
-            $Path = "$RepoDir\bin\$Platform-$Conf\$File"
-            if (-not (Test-Path $Path)) {
-                Write-Output "**** Missing $Path"
-                $Missing = $Missing + 1
-            }
+        $Path = "$RepoDir\bin\$Platform-$Conf\pthread_lib.lib"
+        if (-not (Test-Path $Path)) {
+            Write-Output "**** Missing $Path"
+            $Missing = $Missing + 1
         }
     }
 }
