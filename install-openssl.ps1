@@ -5,11 +5,11 @@
 
  .PARAMETER ForceDownload
 
-  Force a download even if the OpenSSL is already downloaded.
+  Force a download even if the OpenSSL installers are already downloaded.
 
  .PARAMETER NoInstall
 
-  Do not install the OpenSSL package. By default, OpenSSL is installed.
+  Do not install the OpenSSL packages. By default, OpenSSL is installed.
 
  .PARAMETER NoPause
 
@@ -75,8 +75,8 @@ $Ref32 = $response.Links.href | Where-Object { $_ -like "*/Win32OpenSSL-*.msi" }
 $Ref64 = $response.Links.href | Where-Object { $_ -like "*/Win64OpenSSL-*.msi" } | Select-Object -First 1
 
 # Build the absolute URL's from base URL (the download page) and href links.
-$Url32 = (New-Object -TypeName 'System.Uri' -ArgumentList ([System.Uri]$OpenSSLHomePage), $Ref32)
-$Url64 = (New-Object -TypeName 'System.Uri' -ArgumentList ([System.Uri]$OpenSSLHomePage), $Ref64)
+$Url32 = New-Object -TypeName 'System.Uri' -ArgumentList ([System.Uri]$OpenSSLHomePage, $Ref32)
+$Url64 = New-Object -TypeName 'System.Uri' -ArgumentList ([System.Uri]$OpenSSLHomePage, $Ref64)
 
 # Download and install one MSI package.
 function Download-Install([string]$Url)
