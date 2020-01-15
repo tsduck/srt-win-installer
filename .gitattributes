@@ -1,0 +1,21 @@
+# Text files to always convert to native line endings on checkout.
+.gitignore     text
+.gitattributes text
+*.txt          text
+*.md           text
+
+# Text files that will always have CRLF line endings on checkout.
+*.ps1     text eol=crlf
+*.psm1    text eol=crlf
+*.nsi     text eol=crlf
+*.sln     text eol=crlf
+*.props   text eol=crlf
+*.vcxproj text eol=crlf
+
+# Binary file, do not modify on convert, whatever your git settings are.
+*.exe binary
+*.bin binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.xcf binary
