@@ -109,6 +109,10 @@ Section "Install"
     File "${RepoDir}\srtcore\udt.h"
     File "${Build64Dir}\version.h"
 
+    CreateDirectory "$INSTDIR\include\win"
+    SetOutPath "$INSTDIR\include\win"
+    File "${RepoDir}\common\win\syslog_defs.h"
+
     ; Libraries.
     CreateDirectory "$INSTDIR\lib"
     

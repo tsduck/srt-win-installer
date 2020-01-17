@@ -82,6 +82,10 @@ Select-String -Path $SlnIn -Pattern '".*\.2015\.vcxproj"' |
                     $_
                     '  <Import Project="..\..\visualstudio.multiversion.props"/>'
                 }
+                elseif ($_ -match ' *<WarningLevel>.*</WarningLevel> *') {
+                    # Turn off warnings since they are propagated to application when static linking.
+                    '  <WarningLevel>TurnOffAllWarnings</WarningLevel>'
+                }
                 elseif (-not ($_ -match ' *<PlatformToolset>v1.*</PlatformToolset> *')) {
                     # Delete lines specifying a specific PlatformToolset version.
                     # Make sure that binary directories are not named after MSVC2015.
