@@ -18,7 +18,8 @@ through Homebrew, the macOS installer for open-source projects.
 
 But, on Windows systems, including libsrt in an application is a pain, a huge pain.
 The intructions for building libsrt on Windows in the
-[README file](https://github.com/Haivision/srt/) are sloppy, not to say lousy.
+[README file](https://github.com/Haivision/srt/blob/master/README.md)
+are sloppy, not to say lousy.
 
 However, serious software engineering requires build automation and continuous
 integration. How can you setup build automation for a Windows application using
@@ -50,7 +51,9 @@ You can also do that manually by editing the application project file (the XML
 file named with a `.vcxproj` extension). Add the following line just before
 the end of the file:
 
+~~~
   <Import Project="$(LIBSRT)\libsrt.props"/>
+~~~
 
 ### Building the installer
 
@@ -67,3 +70,5 @@ to be repeated each time a new version of libsrt is available.
 - Prerequisite 2: Install NSIS, the NullSoft Installation Scripting system.
   This can be done automatically by running the PowerShell script `install-nsis.ps1`.
 - Build the libsrt installer by running the PowerShell script `build-all.ps1`.
+
+That's all. It's just automation...
