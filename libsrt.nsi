@@ -94,6 +94,9 @@ Section "Install"
 
     ; Visual Studio property files.
     SetOutPath "$INSTDIR"
+	File LICENSE.libsrt.txt
+	File LICENSE.openssl.txt
+	File LICENSE.pthread.txt
     File "libsrt.props"
 
     ; Header files.
@@ -185,7 +188,13 @@ Section "Uninstall"
     RMDir /r "$0\include"
     RMDir /r "$0\lib"
     Delete "$0\libsrt.props"
+	Delete "$0\LICENSE.libsrt.txt"
+	Delete "$0\LICENSE.openssl.txt"
+	Delete "$0\LICENSE.pthread.txt"
     Delete "$0\Uninstall.exe"
     RMDir "$0"
+
+    ; Notify applications of environment modifications
+    SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 SectionEnd
