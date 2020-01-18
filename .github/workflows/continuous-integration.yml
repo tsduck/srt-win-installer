@@ -12,8 +12,26 @@ on:
       - master
 
 jobs:
-  windows-install:
-    name: Test Windows installation
+  windows-build:
+    name: Test Windows build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install NSIS
+      run: .\install-nsis.ps1 -NoPause
+    - name: Install OpenSSL
+      run: .\install-openssl.ps1 -NoPause
+    - name: Build libsrt
+      run: .\build-all.ps1 -NoPause
+    - name: Test installer
+      run: |
+        Get-ChildItem installers
+        $bin = Get-ChildItem installers -Recurse -Include 'libsrt*.exe' | Select-Object -Last 1
+        Start-Process -FilePath $bin.FullName -ArgumentList @("/S") -Wait
+        Get-ChildItem 'C:\Program Files*\libsrt' -Recurse
+
+  windows-release:
+    name: Test installation from latest published release
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@master
