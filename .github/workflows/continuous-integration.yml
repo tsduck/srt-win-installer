@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@master
     - name: Install libsrt
       run: |
-        install-libsrt.ps1 -NoPause
+        .\install-libsrt.ps1 -NoPause
         Write-Output "LIBSRT='$($env:LIBSRT)'"
     - name: Check installation
       run: |
