@@ -1,0 +1,30 @@
+# GitHub Actions configuration file : Continuous Integration
+
+name: Continuous integration
+
+# Trigger the workflow on push or pull request, for master branch only.
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  windows-test:
+    name: Test Windows installation
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Install libsrt
+      run: |
+        install-libsrt.ps1 -NoPause
+        Write-Output "LIBSRT='$($env:LIBSRT)'"
+    - name: Check installation
+      run: |
+        # Check if the environment variable is correctly passed from job to job.
+        Write-Output "LIBSRT='$($env:LIBSRT)'"
+        Get-ChildItem 'C:\Program Files*\libsrt'
+        Get-ChildItem $($env:LIBSRT)
+
