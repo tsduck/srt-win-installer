@@ -29,18 +29,3 @@ jobs:
         $bin = Get-ChildItem installers -Recurse -Include 'libsrt*.exe' | Select-Object -Last 1
         Start-Process -FilePath $bin.FullName -ArgumentList @("/S") -Wait
         Get-ChildItem 'C:\Program Files*\libsrt' -Recurse
-
-  windows-release:
-    name: Test installation from latest published release
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Install libsrt
-      run: .\install-libsrt.ps1 -GitHubActions -NoPause
-    - name: Check installation
-      run: |
-        # Check if the environment variable is correctly passed from job to job.
-        Write-Output "LIBSRT='$($env:LIBSRT)'"
-        Get-ChildItem 'C:\Program Files*\libsrt'
-        Get-ChildItem $($env:LIBSRT)
-

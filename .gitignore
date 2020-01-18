@@ -1,6 +1,5 @@
 external
 installers
-
 *.a
 *.o
 *.so
@@ -51,3 +50,4 @@ cov-int
 *.trp
 .DS_Store
 ._*
+!release*.yml
