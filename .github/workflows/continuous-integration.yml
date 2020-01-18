@@ -20,7 +20,9 @@ jobs:
     - name: Install libsrt
       run: |
         .\install-libsrt.ps1 -NoPause
-        Write-Output "LIBSRT='$($env:LIBSRT)'"
+        # Propagate LIBSRT in next jobs.
+        $libsrt = [System.Environment]::GetEnvironmentVariable("LIBSRT","Machine")
+        Write-Output "::set-env name=LIBSRT::$libsrt"
     - name: Check installation
       run: |
         # Check if the environment variable is correctly passed from job to job.
