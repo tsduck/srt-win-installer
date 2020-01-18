@@ -12,17 +12,13 @@ on:
       - master
 
 jobs:
-  windows-test:
+  windows-install:
     name: Test Windows installation
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@master
     - name: Install libsrt
-      run: |
-        .\install-libsrt.ps1 -NoPause
-        # Propagate LIBSRT in next jobs.
-        $libsrt = [System.Environment]::GetEnvironmentVariable("LIBSRT","Machine")
-        Write-Output "::set-env name=LIBSRT::$libsrt"
+      run: .\install-libsrt.ps1 -GitHubActions -NoPause
     - name: Check installation
       run: |
         # Check if the environment variable is correctly passed from job to job.
