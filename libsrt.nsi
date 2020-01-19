@@ -1,9 +1,40 @@
+;-----------------------------------------------------------------------------
+;
+;  SRT library build procedures for Windows
+;  Copyright (c) 2020, Thierry Lelegard
+;  All rights reserved.
+;
+;  Redistribution and use in source and binary forms, with or without
+;  modification, are permitted provided that the following conditions are met:
+;
+;  1. Redistributions of source code must retain the above copyright notice,
+;     this list of conditions and the following disclaimer.
+;  2. Redistributions in binary form must reproduce the above copyright
+;     notice, this list of conditions and the following disclaimer in the
+;     documentation and/or other materials provided with the distribution.
+;
+;  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+;  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+;  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+;  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+;  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+;  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+;  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+;  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+;  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+;  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+;  THE POSSIBILITY OF SUCH DAMAGE.
+;
+;-----------------------------------------------------------------------------
+;
 ; NSIS script to build the SRT binary installer for Windows.
 ; Do not invoke NSIS directly, use PowerShell script build-installer.ps1.
 ;
 ; Required command-line definitions:
 ; - Version : Product version.
 ; - VersionInfo : Product version info in Windows format.
+;
+;-----------------------------------------------------------------------------
 
 Name "SRT"
 Caption "SRT Libraries Installer"

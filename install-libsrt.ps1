@@ -1,9 +1,43 @@
-﻿<#
+﻿#-----------------------------------------------------------------------------
+#
+#  SRT library build procedures for Windows
+#  Copyright (c) 2020, Thierry Lelegard
+#  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright notice,
+#     this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#  THE POSSIBILITY OF SUCH DAMAGE.
+#
+#-----------------------------------------------------------------------------
+
+<#
  .SYNOPSIS
 
   Download and install the libsrt library for Windows.
   This script is provided as an example for Windows applications using
   libsrt which want to automate their build.
+
+ .PARAMETER Destination
+
+  Specifiy a local directory where the libsrt package will be downloaded.
+  By default, use "external" subdirectory from this script.
 
  .PARAMETER ForceDownload
 
@@ -26,6 +60,7 @@
 #>
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
+    [string]$Destination = "$PSScriptRoot\external",
     [switch]$ForceDownload = $false,
     [switch]$GitHubActions = $false,
     [switch]$NoInstall = $false,
@@ -33,6 +68,8 @@ param(
 )
 
 Write-Output "libsrt download and installation procedure"
+
+# Web page for the latest releases of srt-win-installer.
 $ReleasePage = "https://github.com/tsduck/srt-win-installer/releases/latest"
 
 # A function to exit this script.
@@ -48,13 +85,6 @@ function Exit-Script([string]$Message = "")
     }
     exit $Code
 }
-
-# Local file names.
-$RootDir = $PSScriptRoot
-$ExtDir = "$RootDir\msvc\tmp"
-
-# Create the directory for external products when necessary.
-[void] (New-Item -Path $ExtDir -ItemType Directory -Force)
 
 # Without this, Invoke-WebRequest is awfully slow.
 $ProgressPreference = 'SilentlyContinue'
@@ -87,10 +117,13 @@ if (-not $Ref) {
     Exit-Script "Could not find a reference to libsrt installer in ${ReleasePage}"
 }
 
+# Create the directory for external products when necessary.
+[void](New-Item -Path $Destination -ItemType Directory -Force)
+
 # Build the absolute URL's from base URL (the download page) and href links.
 $Url = New-Object -TypeName 'System.Uri' -ArgumentList ([System.Uri]$ReleasePage, $Ref)
 $InstallerName = (Split-Path -Leaf $Url.LocalPath)
-$InstallerPath = "$ExtDir\$InstallerName"
+$InstallerPath = "$Destination\$InstallerName"
 
 # Download installer
 if (-not $ForceDownload -and (Test-Path $InstallerPath)) {
