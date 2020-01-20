@@ -32,6 +32,14 @@
 
   Build the SRT static libraries installer for Windows.
 
+ .PARAMETER BareVersion
+
+  Use the "bare version" number from libsrt (in file version.h). This is the
+  most recent official version number. Since there are likely some commits
+  in the libsrt repository since the last commit, this may not be the most
+  appropriate version number. By default, use a detailed version number
+  (most recent version, number of commits since then, short commit SHA).
+
  .PARAMETER NoPause
 
   Do not wait for the user to press <enter> at end of execution. By default,
@@ -39,7 +47,10 @@
   when the script was run from Windows Explorer.
 #>
 [CmdletBinding()]
-param([switch]$NoPause = $false)
+param(
+    [switch]$BareVersion = $false,
+    [switch]$NoPause = $false
+)
 
 Write-Output "SRT libraries installer build procedure"
 
@@ -47,13 +58,24 @@ Write-Output "SRT libraries installer build procedure"
 $RootDir = $PSScriptRoot
 
 # Get version strings.
-$VersionFile = "$RootDir\external\srt.build.x64\version.h"
-$Major = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MAJOR ").ToString() -replace "#define SRT_VERSION_MAJOR *","")
-$Minor = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MINOR ").ToString() -replace "#define SRT_VERSION_MINOR *","")
-$Patch = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_PATCH ").ToString() -replace "#define SRT_VERSION_PATCH *","")
-$Version = "${Major}.${Minor}.${Patch}"
-$VersionInfo = "${Major}.${Minor}.${Patch}.0"
-Write-Output "SRT version is $Version"
+if ($BareVersion) {
+    # Identify from latest version.
+    $VersionFile = "$RootDir\external\srt.build.x64\version.h"
+    $Major = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MAJOR ").ToString() -replace "#define SRT_VERSION_MAJOR *","")
+    $Minor = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MINOR ").ToString() -replace "#define SRT_VERSION_MINOR *","")
+    $Patch = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_PATCH ").ToString() -replace "#define SRT_VERSION_PATCH *","")
+    $Version = "${Major}.${Minor}.${Patch}"
+    $VersionInfo = "${Major}.${Minor}.${Patch}.0"
+}
+else {
+    Push-Location "$RootDir\external\srt"
+    $Version = (git describe --tags ) -replace '^v','' -replace '-g','-'
+    Pop-Location
+    # Split version string in pieces and make sure it has at least four elements.
+    $VField = ($Version -split "[-\. ]") + @("0", "0", "0", "0")
+    $VersionInfo = "$($VField[0]).$($VField[1]).$($VField[2]).$($VField[3])"
+}
+Write-Output "SRT version is $Version, Windows version info is $VersionInfo"
 
 # A function to exit this script.
 function Exit-Script([string]$Message = "")
