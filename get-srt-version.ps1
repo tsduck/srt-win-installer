@@ -30,7 +30,7 @@
 <#
  .SYNOPSIS
 
-  Build everything for the SRT static libraries installer for Windows.
+  Get the version string of the SRT library.
 
  .PARAMETER BareVersion
 
@@ -40,18 +40,37 @@
   appropriate version number. By default, use a detailed version number
   (most recent version, number of commits since then, short commit SHA).
 
- .PARAMETER NoPause
+ .PARAMETER Windows
 
-  Do not wait for the user to press <enter> at end of execution. By default,
-  execute a "pause" instruction at the end of execution, which is useful
-  when the script was run from Windows Explorer.
+  Return a "version info" string for Windows executable.
 #>
 [CmdletBinding()]
 param(
     [switch]$BareVersion = $false,
-    [switch]$NoPause = $false
+    [switch]$Windows = $false
 )
 
-& "$PSScriptRoot\build-pthread.ps1" -NoPause
-& "$PSScriptRoot\build-srt.ps1" -BareVersion:$BareVersion -NoPause
-& "$PSScriptRoot\build-installer.ps1" -BareVersion:$BareVersion -NoPause:$NoPause
+if ($BareVersion) {
+    # Identify from latest version.
+    $VersionFile = "$PSScriptRoot\external\srt.build.x64\version.h"
+    $Major = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MAJOR ").ToString() -replace "#define SRT_VERSION_MAJOR *","")
+    $Minor = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MINOR ").ToString() -replace "#define SRT_VERSION_MINOR *","")
+    $Patch = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_PATCH ").ToString() -replace "#define SRT_VERSION_PATCH *","")
+    $Version = "${Major}.${Minor}.${Patch}"
+    $VersionInfo = "${Major}.${Minor}.${Patch}.0"
+}
+else {
+    Push-Location "$PSScriptRoot\external\srt"
+    $Version = (git describe --tags ) -replace '^v','' -replace '-g','-'
+    Pop-Location
+    # Split version string in pieces and make sure it has at least four elements.
+    $VField = ($Version -split "[-\. ]") + @("0", "0", "0", "0")
+    $VersionInfo = "$($VField[0]).$($VField[1]).$($VField[2]).$($VField[3])"
+}
+
+if ($Windows) {
+    Write-Output $VersionInfo
+}
+else {
+    Write-Output $Version
+}

@@ -32,6 +32,14 @@
 
   Build the SRT library for Windows.
 
+ .PARAMETER BareVersion
+
+  Use the "bare version" number from libsrt (in file version.h). This is the
+  most recent official version number. Since there are likely some commits
+  in the libsrt repository since the last commit, this may not be the most
+  appropriate version number. By default, use a detailed version number
+  (most recent version, number of commits since then, short commit SHA).
+
  .PARAMETER NoPause
 
   Do not wait for the user to press <enter> at end of execution. By default,
@@ -39,7 +47,10 @@
   when the script was run from Windows Explorer.
 #>
 [CmdletBinding()]
-param([switch]$NoPause = $false)
+param(
+    [switch]$BareVersion = $false,
+    [switch]$NoPause = $false
+)
 
 Write-Output "SRT build procedure"
 $RepoUrl = "https://github.com/Haivision/srt.git"
@@ -144,8 +155,20 @@ foreach ($Platform in @("x64", "Win32")) {
     & $CMake -S $RepoDir -B $SrtBuildDir -A $Platform `
         -DPTHREAD_INCLUDE_DIR="$PthreadInclude" `
         -DPTHREAD_LIBRARY="$Plib" `
-        -DOPENSSL_ROOT_DIR="$SRoot" `        -DOPENSSL_LIBRARIES="$SRoot\lib\libssl_static.lib;$SRoot\lib\libcrypto_static.lib" `
+        -DOPENSSL_ROOT_DIR="$SRoot" `
+        -DOPENSSL_LIBRARIES="$SRoot\lib\libssl_static.lib;$SRoot\lib\libcrypto_static.lib" `
         -DOPENSSL_INCLUDE_DIR="$SRoot\include"
+
+    # Patch version string in version.h
+    if (-not $BareVersion) {
+        $Version = (& "$PSScriptRoot\get-srt-version.ps1")
+        Get-Content "$SrtBuildDir\version.h" |
+            ForEach-Object {
+                $_ -replace "#define *SRT_VERSION_STRING .*","#define SRT_VERSION_STRING `"$Version`""
+            } |
+            Out-File "$SrtBuildDir\version.new" -Encoding ascii
+        Move-Item "$SrtBuildDir\version.new" "$SrtBuildDir\version.h" -Force
+    }
 
     Write-Output "Building for platform $Platform ..."
     foreach ($Conf in @("Release", "Debug")) {

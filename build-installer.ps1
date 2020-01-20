@@ -58,23 +58,8 @@ Write-Output "SRT libraries installer build procedure"
 $RootDir = $PSScriptRoot
 
 # Get version strings.
-if ($BareVersion) {
-    # Identify from latest version.
-    $VersionFile = "$RootDir\external\srt.build.x64\version.h"
-    $Major = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MAJOR ").ToString() -replace "#define SRT_VERSION_MAJOR *","")
-    $Minor = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_MINOR ").ToString() -replace "#define SRT_VERSION_MINOR *","")
-    $Patch = ((Get-Content $VersionFile | Select-String -Pattern "#define SRT_VERSION_PATCH ").ToString() -replace "#define SRT_VERSION_PATCH *","")
-    $Version = "${Major}.${Minor}.${Patch}"
-    $VersionInfo = "${Major}.${Minor}.${Patch}.0"
-}
-else {
-    Push-Location "$RootDir\external\srt"
-    $Version = (git describe --tags ) -replace '^v','' -replace '-g','-'
-    Pop-Location
-    # Split version string in pieces and make sure it has at least four elements.
-    $VField = ($Version -split "[-\. ]") + @("0", "0", "0", "0")
-    $VersionInfo = "$($VField[0]).$($VField[1]).$($VField[2]).$($VField[3])"
-}
+$Version = (& "$PSScriptRoot\get-srt-version.ps1" -BareVersion:$BareVersion)
+$VersionInfo = (& "$PSScriptRoot\get-srt-version.ps1" -BareVersion:$BareVersion -Windows)
 Write-Output "SRT version is $Version, Windows version info is $VersionInfo"
 
 # A function to exit this script.
