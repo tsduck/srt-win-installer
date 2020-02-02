@@ -45,11 +45,17 @@
   Do not wait for the user to press <enter> at end of execution. By default,
   execute a "pause" instruction at the end of execution, which is useful
   when the script was run from Windows Explorer.
+
+ .PARAMETER Tag
+
+  Specify the got tag or commit to build. By default, use the latest repo
+  state.
 #>
 [CmdletBinding()]
 param(
     [switch]$BareVersion = $false,
-    [switch]$NoPause = $false
+    [switch]$NoPause = $false,
+    [string]$Tag = ""
 )
 
 Write-Output "SRT build procedure"
@@ -105,22 +111,39 @@ if ($Missing -gt 0) {
 }
 
 # Clone repository or update it.
+# Note that git outputs its log on stderr, so use --quiet.
 if (Test-Path "$RepoDir\.git") {
     # The repo is already cloned, just update it.
     Write-Output "Updating repository ..."
     Push-Location $RepoDir
-    git pull
+    git checkout master --quiet
+    git pull origin master
+    Pop-Location
 }
 else {
-    # Clone the repo. Note that git clone outputs its log on stderr, so use --quiet.
+    # Clone the repo.
     Write-Output "Cloning $RepoUrl ..."
     git clone --quiet $RepoUrl $RepoDir
     if (-not (Test-Path "$RepoDir\.git")) {
         Exit-Script "Failed to clone $RepoUrl"
     }
-    Push-Location $RepoDir
 }
-Pop-Location
+
+# Checkout the required tag.
+if ($Tag.Length -gt 0) {
+    Write-Output "Checking out $Tag ..."
+    Push-Location $RepoDir
+    git checkout --quiet $Tag
+    Pop-Location
+
+    # Cleanup build areas to force a fresh cmake config.
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$RepoDir.build.x64"
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$RepoDir.build.Win32"
+}
+
+# Build the version number.
+$Version = (& "$PSScriptRoot\get-srt-version.ps1" -BareVersion:$BareVersion)
+Write-Output "==> SRT version is $Version"
 
 # Locate MSBuild and CMake, regardless of Visual Studio version.
 Write-Output "Searching MSBuild and CMake ..."
@@ -161,7 +184,6 @@ foreach ($Platform in @("x64", "Win32")) {
 
     # Patch version string in version.h
     if (-not $BareVersion) {
-        $Version = (& "$PSScriptRoot\get-srt-version.ps1")
         Get-Content "$SrtBuildDir\version.h" |
             ForEach-Object {
                 $_ -replace "#define *SRT_VERSION_STRING .*","#define SRT_VERSION_STRING `"$Version`""

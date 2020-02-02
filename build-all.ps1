@@ -45,13 +45,19 @@
   Do not wait for the user to press <enter> at end of execution. By default,
   execute a "pause" instruction at the end of execution, which is useful
   when the script was run from Windows Explorer.
+
+ .PARAMETER Tag
+
+  Specify the got tag or commit to build. By default, use the latest repo
+  state.
 #>
 [CmdletBinding()]
 param(
     [switch]$BareVersion = $false,
-    [switch]$NoPause = $false
+    [switch]$NoPause = $false,
+    [string]$Tag = ""
 )
 
 & "$PSScriptRoot\build-pthread.ps1" -NoPause
-& "$PSScriptRoot\build-srt.ps1" -BareVersion:$BareVersion -NoPause
+& "$PSScriptRoot\build-srt.ps1" -BareVersion:$BareVersion -Tag $Tag -NoPause
 & "$PSScriptRoot\build-installer.ps1" -BareVersion:$BareVersion -NoPause:$NoPause
