@@ -147,7 +147,7 @@ Write-Output "==> SRT version is $Version"
 
 # Locate MSBuild and CMake, regardless of Visual Studio version.
 Write-Output "Searching MSBuild and CMake ..."
-$MSRoots = @("C:\Program Files*\MSBuild", "C:\Program Files*\Microsoft Visual Studio")
+$MSRoots = @("C:\Program Files*\MSBuild", "C:\Program Files*\Microsoft Visual Studio", "C:\Program Files*\CMake*")
 $MSBuild = Get-ChildItem -Recurse -Path $MSRoots -Include MSBuild.exe -ErrorAction Ignore |
     ForEach-Object { (Get-Command $_).FileVersionInfo } |
     Sort-Object -Unique -Property FileVersion |
