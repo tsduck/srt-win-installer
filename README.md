@@ -31,11 +31,9 @@ files and static libraries for 64 and 32 bits applications, in release and debug
 configurations.
 
 Why not providing libsrt DLL's in addition to static libraries? It is a choice which
-may change. The problem with libsrt on Windows is that it does not use the native
-Windows threading and SSL libraries. Instead, it relies on OpenSSL and a
-third-party implementation of pthreads. If a Windows application is linked
+may change. On Windows, libsrt relies on OpenSSL. If a Windows application is linked
 against a libsrt DLL, deploying this application means embedding and deploying
-at least three third-party DLL's in addition to libsrt DLL's. This complicates
+at least two third-party DLL's in addition to libsrt DLL's. This complicates
 the deployment and creates risks of inconsistencies. With static libraries, the
 application is fully autonomous and no third party DLL is necessary.
 

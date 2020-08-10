@@ -54,7 +54,6 @@ Caption "SRT Libraries Installer"
 !define RepoDir       "external\srt"
 !define Build32Dir    "external\srt.build.Win32"
 !define Build64Dir    "external\srt.build.x64"
-!define PthreadBinDir "external\pthread-win32\bin"
 !define SSL32Dir      "C:\Program Files (x86)\OpenSSL-Win32"
 !define SSL64Dir      "C:\Program Files\OpenSSL-Win64"
 
@@ -130,16 +129,22 @@ Section "Install"
     SetShellVarContext all
 
     ; Delete obsolete files from previous versions.
+    Delete "$INSTDIR\LICENSE.pthread.txt"
+    Delete "$INSTDIR\include\srt\srt4udt.h"
+    Delete "$INSTDIR\include\srt\udt.h"
+    Delete "$INSTDIR\lib\Release-x64\pthread.lib"
+    Delete "$INSTDIR\lib\Release-Win32\pthread.lib"
     Delete "$INSTDIR\lib\Debug-x64\srt.pdb"
     Delete "$INSTDIR\lib\Debug-x64\pthread.pdb"
+    Delete "$INSTDIR\lib\Debug-x64\pthread.lib"
     Delete "$INSTDIR\lib\Debug-Win32\srt.pdb"
     Delete "$INSTDIR\lib\Debug-Win32\pthread.pdb"
+    Delete "$INSTDIR\lib\Debug-Win32\pthread.lib"
 
     ; Visual Studio property files.
     SetOutPath "$INSTDIR"
     File LICENSE.libsrt.txt
     File LICENSE.openssl.txt
-    File LICENSE.pthread.txt
     File "libsrt.props"
 
     ; Header files.
@@ -147,9 +152,7 @@ Section "Install"
     SetOutPath "$INSTDIR\include\srt"
     File "${RepoDir}\srtcore\logging_api.h"
     File "${RepoDir}\srtcore\platform_sys.h"
-    File "${RepoDir}\srtcore\srt4udt.h"
     File "${RepoDir}\srtcore\srt.h"
-    File "${RepoDir}\srtcore\udt.h"
     File "${Build64Dir}\version.h"
 
     CreateDirectory "$INSTDIR\include\win"
@@ -162,28 +165,24 @@ Section "Install"
     CreateDirectory "$INSTDIR\lib\Release-x64"
     SetOutPath "$INSTDIR\lib\Release-x64"
     File /oname=srt.lib       "${Build64Dir}\Release\srt_static.lib"
-    File /oname=pthread.lib   "${PthreadBinDir}\x64-Release\pthread_lib.lib"
     File /oname=libcrypto.lib "${SSL64Dir}\lib\VC\static\libcrypto64MD.lib"
     File /oname=libssl.lib    "${SSL64Dir}\lib\VC\static\libssl64MD.lib"
 
     CreateDirectory "$INSTDIR\lib\Debug-x64"
     SetOutPath "$INSTDIR\lib\Debug-x64"
     File /oname=srt.lib       "${Build64Dir}\Debug\srt_static.lib"
-    File /oname=pthread.lib   "${PthreadBinDir}\x64-Debug\pthread_lib.lib"
     File /oname=libcrypto.lib "${SSL64Dir}\lib\VC\static\libcrypto64MDd.lib"
     File /oname=libssl.lib    "${SSL64Dir}\lib\VC\static\libssl64MDd.lib"
 
     CreateDirectory "$INSTDIR\lib\Release-Win32"
     SetOutPath "$INSTDIR\lib\Release-Win32"
     File /oname=srt.lib       "${Build32Dir}\Release\srt_static.lib"
-    File /oname=pthread.lib   "${PthreadBinDir}\Win32-Release\pthread_lib.lib"
     File /oname=libcrypto.lib "${SSL32Dir}\lib\VC\static\libcrypto32MD.lib"
     File /oname=libssl.lib    "${SSL32Dir}\lib\VC\static\libssl32MD.lib"
 
     CreateDirectory "$INSTDIR\lib\Debug-Win32"
     SetOutPath "$INSTDIR\lib\Debug-Win32"
     File /oname=srt.lib       "${Build32Dir}\Debug\srt_static.lib"
-    File /oname=pthread.lib   "${PthreadBinDir}\Win32-Debug\pthread_lib.lib"
     File /oname=libcrypto.lib "${SSL32Dir}\lib\VC\static\libcrypto32MDd.lib"
     File /oname=libssl.lib    "${SSL32Dir}\lib\VC\static\libssl32MDd.lib"
 
@@ -233,7 +232,6 @@ Section "Uninstall"
     Delete "$0\libsrt.props"
     Delete "$0\LICENSE.libsrt.txt"
     Delete "$0\LICENSE.openssl.txt"
-    Delete "$0\LICENSE.pthread.txt"
     Delete "$0\Uninstall.exe"
     RMDir "$0"
 

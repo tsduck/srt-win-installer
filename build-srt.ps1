@@ -83,15 +83,6 @@ $RepoDir = "$ExtDir\srt"
 # Create the directory for external products when necessary.
 [void](New-Item -Path $ExtDir -ItemType Directory -Force)
 
-# Locate pthread from local build dir.
-$PthreadRoot = "$ExtDir\pthread-win32"
-$PthreadInclude = $PthreadRoot
-$PthreadHeader = "$PthreadInclude\pthread.h"
-$PthreadLibrary = @{
-    "x64" = "$PthreadRoot\bin\x64-Release\pthread_lib.lib";
-    "Win32" = "$PthreadRoot\bin\Win32-Release\pthread_lib.lib"
-}
-
 # Locate OpenSSL root from local installation.
 $SslRoot = @{
     "x64" = "C:\Program Files\OpenSSL-Win64";
@@ -100,7 +91,7 @@ $SslRoot = @{
 
 # Verify a few files.
 $Missing = 0
-foreach ($file in @($PthreadHeader, $PthreadLibrary["x64"], $PthreadLibrary["Win32"], $SslRoot["x64"], $SslRoot["Win32"])) {
+foreach ($file in @($SslRoot["x64"], $SslRoot["Win32"])) {
     if (-not (Test-Path $file)) {
         Write-Output "**** Missing $file"
         $Missing = $Missing + 1
@@ -173,11 +164,9 @@ foreach ($Platform in @("x64", "Win32")) {
     [void](New-Item -Path $SrtBuildDir -ItemType Directory -Force)
 
     Write-Output "Configuring build for platform $Platform ..."
-    $PLib = $PthreadLibrary[$Platform]
     $SRoot = $SslRoot[$Platform]
     & $CMake -S $RepoDir -B $SrtBuildDir -A $Platform `
-        -DPTHREAD_INCLUDE_DIR="$PthreadInclude" `
-        -DPTHREAD_LIBRARY="$Plib" `
+        -DENABLE_STDCXX_SYNC=ON `
         -DOPENSSL_ROOT_DIR="$SRoot" `
         -DOPENSSL_LIBRARIES="$SRoot\lib\libssl_static.lib;$SRoot\lib\libcrypto_static.lib" `
         -DOPENSSL_INCLUDE_DIR="$SRoot\include"

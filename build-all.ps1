@@ -58,6 +58,5 @@ param(
     [string]$Tag = ""
 )
 
-& "$PSScriptRoot\build-pthread.ps1" -NoPause
 & "$PSScriptRoot\build-srt.ps1" -BareVersion:$BareVersion -Tag $Tag -NoPause
 & "$PSScriptRoot\build-installer.ps1" -BareVersion:$BareVersion -NoPause:$NoPause
