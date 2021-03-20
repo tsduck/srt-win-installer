@@ -64,7 +64,7 @@ else {
     $Version = (git describe --tags ) -replace '^v','' -replace '-g','-'
     Pop-Location
     # Split version string in pieces and make sure it has at least four elements.
-    $VField = ($Version -split "[-\. ]") + @("0", "0", "0", "0")
+    $VField = ($Version -split "[-\. ]") + @("0", "0", "0", "0") | Select-String -Pattern '^\d*$'
     $VersionInfo = "$($VField[0]).$($VField[1]).$($VField[2]).$($VField[3])"
 }
 
